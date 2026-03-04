@@ -1,6 +1,17 @@
 spring:
+  application:
+    name: dl-backend
+
+  # Configuración de Redis
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      # password: tu_password_si_aplica
+
+  # Configuración de Kafka
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_BROKERS:localhost:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
@@ -9,7 +20,9 @@ spring:
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-  data:
-    redis:
-      host: localhost
-      port: 6379
+
+# Configuración personalizada de la aplicación
+app:
+  kafka:
+    topic:
+      dl-tasks: "dl-tasks-topic"
