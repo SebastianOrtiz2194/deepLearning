@@ -20,7 +20,7 @@ Un backend robusto, escalable y orientado a eventos diseñado para servir modelo
 
 - Docker y Docker Compose
 
-## 🚀 Instalación y Ejecución Local
+## Instalación y Ejecución Local
 
 ### 1. Clonar el repositorio
 
