@@ -8,7 +8,7 @@ Un backend robusto, escalable y orientado a eventos diseñado para servir modelo
 
 - Escalabilidad Horizontal: Los workers (consumidores de Kafka) pueden escalar independientemente del API Gateway.
 
-- Alta Disponibilidad: Uso de Kafka para garantizar la entrega de mensajes y evitar pérdida de tareas en caso de caídas.
+- Alta Disponibilidad: Uso de Kafka para garantizar la entrega de los mensajes y evitar pérdida de tareas en caso de caídas.
 
 - Inferencia Nativa: Integración con modelos de PyTorch, TensorFlow o MXNet directamente en la JVM a través de DJL. 
 
