@@ -1,41 +1,64 @@
 package com.deepLearning.controller;
 
+import com.deepLearning.dto.PredictionRequest;
+import com.deepLearning.dto.PredictionResponse;
+import com.deepLearning.service.DlResultService;
+import com.deepLearning.service.DlTaskProducer;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.data.redis.core.StringRedisTemplate;
+
 import java.util.UUID;
 
+/**
+ * API Gateway para recibir solicitudes HTTP de clientes web/móviles.
+ */
 @RestController
 @RequestMapping("/api/dl")
+@RequiredArgsConstructor
 public class DeepLearningController {
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final StringRedisTemplate redisTemplate;
+    private final DlTaskProducer taskProducer;
+    private final DlResultService resultService;
 
-    public DeepLearningController(KafkaTemplate<String, String> kafkaTemplate, StringRedisTemplate redisTemplate) {
-        this.kafkaTemplate = kafkaTemplate;
-        this.redisTemplate = redisTemplate;
-    }
-
-    // 1. Enviar tarea de inferencia
     @PostMapping("/predict")
-    public String startPrediction(@RequestBody String payload) {
+    public ResponseEntity<PredictionResponse> startPrediction(@RequestBody PredictionRequest request) {
+        // 1. Generar un ID único para la solicitud
         String jobId = UUID.randomUUID().toString();
 
-        // Guardar estado inicial en Redis
-        redisTemplate.opsForValue().set(jobId, "PROCESANDO");
+        // 2. Guardar estado en Redis (Caché)
+        resultService.saveInitialState(jobId);
 
-        // Enviar a Kafka (El payload en un caso real sería un JSON con la URL de la imagen o los datos)
-        String kafkaMessage = jobId + "|" + payload;
-        kafkaTemplate.send("dl-tasks", kafkaMessage);
+        // 3. Mandar el evento asíncrono a Kafka
+        taskProducer.sendTaskToQueue(jobId, request);
 
-        return "Tarea recibida. ID de seguimiento: " + jobId;
+        // 4. Responder al cliente inmediatamente sin bloquear
+        PredictionResponse response = PredictionResponse.builder()
+                .jobId(jobId)
+                .status("PENDIENTE")
+                .message("La tarea ha sido encolada correctamente. Consulta usando el jobId.")
+                .build();
+
+        return ResponseEntity.accepted().body(response);
     }
 
-    // 2. Consultar resultado
     @GetMapping("/result/{jobId}")
-    public String getResult(@PathVariable String jobId) {
-        String result = redisTemplate.opsForValue().get(jobId);
-        return result != null ? result : "Tarea no encontrada";
+    public ResponseEntity<PredictionResponse> getResult(@PathVariable String jobId) {
+        String status = resultService.getStatus(jobId);
+
+        if (status == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        PredictionResponse response = PredictionResponse.builder()
+                .jobId(jobId)
+                .status(status)
+                .build();
+
+        if ("COMPLETADO".equals(status) || "ERROR".equals(status)) {
+            response.setResult(resultService.getResult(jobId));
+        }
+
+        return ResponseEntity.ok(response);
     }
 }
