@@ -1,41 +1,40 @@
 package com.deepLearning.service;
 
-import ai.djl.Application;
-import ai.djl.ModelException;
-import ai.djl.inference.Predictor;
-import ai.djl.repository.zoo.Criteria;
-import ai.djl.repository.zoo.ZooModel;
-import ai.djl.training.util.ProgressBar;
-import ai.djl.translate.TranslateException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-
+/**
+ * Servicio donde vive la lógica de Deep Java Library (DJL).
+ */
+@Slf4j
 @Service
 public class DjlInferenceService {
 
-    // Este es un ejemplo conceptual. En la vida real, cargarías tu modelo .pt o .savedmodel
-    public String predict(String inputData) {
+    /**
+     * Ejecuta el modelo de IA.
+     * @param inputData URL o datos del elemento a predecir.
+     * @return El resultado serializado en String (ej. JSON).
+     */
+    public String runPrediction(String inputData) {
+        log.info("Iniciando inferencia profunda para: {}", inputData);
+
         try {
-            // Simulamos un retraso de procesamiento de GPU/CPU
-            Thread.sleep(3000);
+            // Aquí iría tu lógica real de DJL.
+            // Ej: Criteria.builder().setTypes(...).build().loadModel().newPredictor().predict(...)
 
-            /* CÓDIGO REAL DE DJL (Comentado para estructura)
-            Criteria<String, String> criteria = Criteria.builder()
-                    .setTypes(String.class, String.class)
-                    .optModelUrls("file:///ruta/a/tu/modelo")
-                    .build();
+            // Simulamos tiempo de inferencia de 3 a 5 segundos (GPU/CPU intensa)
+            long simulationTime = 3000L + (long)(Math.random() * 2000L);
+            Thread.sleep(simulationTime);
 
-            try (ZooModel<String, String> model = criteria.loadModel();
-                 Predictor<String, String> predictor = model.newPredictor()) {
-                return predictor.predict(inputData);
-            }
-            */
+            // Simulamos una salida JSON del modelo
+            return String.format("{\"class\": \"Gato\", \"confidence\": 0.98, \"data_analizada\": \"%s\"}", inputData);
 
-            return "Predicción exitosa para: " + inputData + " -> [Clase: Gato, Confianza: 0.98]";
-
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Inferencia interrumpida", e);
         } catch (Exception e) {
-            return "ERROR_EN_PREDICCION";
+            log.error("Fallo durante la ejecución del modelo", e);
+            throw new RuntimeException("Error en modelo: " + e.getMessage());
         }
     }
 }
