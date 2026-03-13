@@ -2,6 +2,7 @@ package com.deepLearning.controller;
 
 import com.deepLearning.dto.PredictionRequest;
 import com.deepLearning.dto.PredictionResponse;
+import com.deepLearning.enums.JobStatus;
 import com.deepLearning.service.DlResultService;
 import com.deepLearning.service.DlTaskProducer;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +36,7 @@ public class DeepLearningController {
         // 4. Responder al cliente inmediatamente sin bloquear
         PredictionResponse response = PredictionResponse.builder()
                 .jobId(jobId)
-                .status("PENDIENTE")
+                .status(JobStatus.PENDIENTE.name())
                 .message("La tarea ha sido encolada correctamente. Consulta usando el jobId.")
                 .build();
 
@@ -44,21 +45,21 @@ public class DeepLearningController {
 
     @GetMapping("/result/{jobId}")
     public ResponseEntity<PredictionResponse> getResult(@PathVariable String jobId) {
-        String status = resultService.getStatus(jobId);
+        String statusStr = resultService.getStatus(jobId);
 
-        if (status == null) {
+        if (statusStr == null) {
             return ResponseEntity.notFound().build();
         }
 
-        PredictionResponse response = PredictionResponse.builder()
+        JobStatus status = JobStatus.valueOf(statusStr);
+        PredictionResponse.PredictionResponseBuilder responseBuilder = PredictionResponse.builder()
                 .jobId(jobId)
-                .status(status)
-                .build();
+                .status(status.name());
 
-        if ("COMPLETADO".equals(status) || "ERROR".equals(status)) {
-            response.setResult(resultService.getResult(jobId));
+        if (status == JobStatus.COMPLETADO || status == JobStatus.ERROR) {
+            responseBuilder.result(resultService.getResult(jobId));
         }
 
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(responseBuilder.build());
     }
 }
