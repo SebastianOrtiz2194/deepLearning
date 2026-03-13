@@ -1,5 +1,6 @@
 package com.deepLearning.service;
 
+import com.deepLearning.enums.JobStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -22,23 +23,27 @@ public class DlResultService {
 
     public void saveInitialState(String jobId) {
         log.info("Guardando estado inicial en Redis para Job: {}", jobId);
-        redisTemplate.opsForValue().set(jobId + ":status", "PENDIENTE", KEY_EXPIRATION);
+        saveStatus(jobId, JobStatus.PENDIENTE);
     }
 
     public void saveProcessingState(String jobId) {
-        redisTemplate.opsForValue().set(jobId + ":status", "PROCESANDO", KEY_EXPIRATION);
+        saveStatus(jobId, JobStatus.PROCESANDO);
     }
 
     public void saveFinalResult(String jobId, String result) {
         log.info("Guardando resultado final en Redis para Job: {}", jobId);
-        redisTemplate.opsForValue().set(jobId + ":status", "COMPLETADO", KEY_EXPIRATION);
+        saveStatus(jobId, JobStatus.COMPLETADO);
         redisTemplate.opsForValue().set(jobId + ":result", result, KEY_EXPIRATION);
     }
 
     public void saveErrorState(String jobId, String errorMessage) {
         log.error("Guardando estado de ERROR en Redis para Job: {}", jobId);
-        redisTemplate.opsForValue().set(jobId + ":status", "ERROR", KEY_EXPIRATION);
+        saveStatus(jobId, JobStatus.ERROR);
         redisTemplate.opsForValue().set(jobId + ":result", errorMessage, KEY_EXPIRATION);
+    }
+
+    private void saveStatus(String jobId, JobStatus status) {
+        redisTemplate.opsForValue().set(jobId + ":status", status.name(), KEY_EXPIRATION);
     }
 
     public String getStatus(String jobId) {
