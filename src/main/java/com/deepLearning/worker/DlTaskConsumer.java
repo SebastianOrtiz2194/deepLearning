@@ -1,8 +1,8 @@
 package com.deepLearning.worker;
 
 import com.deepLearning.dto.KafkaTask;
-import com.deepLearning.service.DjlInferenceService;
 import com.deepLearning.service.DlResultService;
+import com.deepLearning.worker.inference.DjlInferenceService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
