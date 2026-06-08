@@ -24,15 +24,11 @@
 
     <modules>
         <module>common</module>
-        <module>discovery-server</module>
-        <module>api-gateway</module>
-        <module>inference-service</module>
-        <module>inference-worker</module>
+        <!-- inference-service and inference-worker added in Phases 2-3 -->
     </modules>
 
     <properties>
         <java.version>17</java.version>
-        <spring-cloud.version>2023.0.1</spring-cloud.version>
         <djl.version>0.26.0</djl.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
@@ -41,15 +37,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- Spring Cloud BOM -->
-            <dependency>
-                <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring-cloud.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-
             <!-- Internal modules -->
             <dependency>
                 <groupId>com.deeplearning</groupId>
