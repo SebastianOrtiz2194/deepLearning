@@ -24,7 +24,8 @@
 
     <modules>
         <module>common</module>
-        <!-- inference-service and inference-worker added in Phases 2-3 -->
+        <module>inference-service</module>
+        <!-- inference-worker added in Phase 3 -->
     </modules>
 
     <properties>
