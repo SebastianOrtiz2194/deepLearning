@@ -18,7 +18,7 @@
 
     <name>Deep Learning Platform</name>
     <description>
-        A production-grade microservices platform for asynchronous deep learning inference.
+        A microservices platform for asynchronous deep learning inference.
         Uses Spring Boot, Kafka, Redis, and DJL (Deep Java Library) for real-time image classification.
     </description>
 
