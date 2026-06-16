@@ -1,0 +1,57 @@
+spring:
+  application:
+    name: inference-service
+
+  # Redis connection
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+  # Kafka producer config
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
+# Custom application properties
+app:
+  kafka:
+    topic:
+      dl-tasks: dl-tasks-topic
+
+# Actuator health and info endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when-authorized
+
+server:
+  port: ${SERVER_PORT:8080}
+
+---
+# Development profile — verbose logging
+spring:
+  config:
+    activate:
+      on-profile: dev
+
+logging:
+  level:
+    com.deeplearning: DEBUG
+
+---
+# Production profile — info-level logging
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+logging:
+  level:
+    com.deeplearning: INFO
