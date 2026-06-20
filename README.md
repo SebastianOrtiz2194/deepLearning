@@ -1,4 +1,4 @@
-# 🧠 Deep Learning Asynchronous Backend
+# Deep Learning Asynchronous Backend
 
 Un backend robusto, escalable y orientado a eventos diseñado para servir modelos de Machine Learning y Deep Learning pesados sin bloquear las peticiones de los usuarios. Utiliza Spring Boot como orquestador, Apache Kafka para el encolamiento de tareas, Redis para el manejo de estados rápidos y Deep Java Library (DJL) para la inferencia nativa en Java.
 
