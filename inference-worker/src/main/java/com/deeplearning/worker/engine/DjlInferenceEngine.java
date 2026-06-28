@@ -4,7 +4,12 @@ import ai.djl.inference.Predictor;
 import ai.djl.modality.Classifications;
 import ai.djl.modality.cv.Image;
 import ai.djl.modality.cv.ImageFactory;
+import ai.djl.modality.cv.transform.CenterCrop;
+import ai.djl.modality.cv.transform.Normalize;
+import ai.djl.modality.cv.transform.Resize;
+import ai.djl.modality.cv.transform.ToTensor;
 import ai.djl.modality.cv.translator.ImageClassificationTranslator;
+import ai.djl.translate.Pipeline;
 import ai.djl.translate.Translator;
 import com.deeplearning.common.dto.PredictionResult;
 import com.deeplearning.common.exception.InferenceException;
@@ -34,6 +39,12 @@ import java.util.List;
 public class DjlInferenceEngine implements InferenceEngine {
 
     private static final Logger log = LoggerFactory.getLogger(DjlInferenceEngine.class);
+
+    private static final Pipeline IMAGE_PIPELINE = new Pipeline()
+            .add(new Resize(256))
+            .add(new CenterCrop(224, 224))
+            .add(new ToTensor())
+            .add(new Normalize(new float[]{0.485f, 0.456f, 0.406f}, new float[]{0.229f, 0.224f, 0.225f}));
 
     private final ai.djl.Model model;
 
@@ -66,7 +77,9 @@ public class DjlInferenceEngine implements InferenceEngine {
         }
 
         Translator<Image, Classifications> translator =
-                ImageClassificationTranslator.builder().build();
+                ImageClassificationTranslator.builder()
+                        .setPipeline(IMAGE_PIPELINE)
+                        .build();
 
         try (Predictor<Image, Classifications> predictor = model.newPredictor(translator)) {
             Classifications result = predictor.predict(image);
